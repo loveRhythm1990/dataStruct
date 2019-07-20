@@ -105,7 +105,41 @@ func nonRecursiveInOrder(node *TreeNode, res *[]int) {
 			}
 		}
 	}
+}
 
+// non-recursive post order, is it suitable to use a set ?
+// when assess a nodes right child, put it in a set
+func nonRecursivePostOrder(node *TreeNode, res *[]int) {
+	stack := make([]*TreeNode, 0)
+	for node != nil {
+		stack = append(stack, node)
+		node = node.Left
+	}
+
+	sets := make(map[*TreeNode]struct{})
+	for len(stack) > 0 {
+		top := stack[len(stack)-1]
+		_, exist := sets[top]
+
+		// the top element has no right child, or already been accessed, pop
+		if top.Right == nil || exist {
+			// pop
+			stack = stack[0 : len(stack)-1]
+			*res = append(*res, top.Val)
+			continue
+		}
+
+		// the top element has right child, do not pop, access its right child
+		if top.Right != nil {
+			// if right child is not nil, do not pop out of stack, access its right child
+			sets[top] = struct{}{}
+			right := top.Right
+			for right != nil {
+				stack = append(stack, right)
+				right = right.Left
+			}
+		}
+	}
 }
 
 // recursive pre-order traverse
@@ -146,7 +180,7 @@ func main() {
 
 	res := make([]int, 0)
 	//preOrder(root, &res)
-	nonRecursiveInOrder(root, &res)
+	nonRecursivePostOrder(root, &res)
 	fmt.Println(res)
 }
 
